@@ -1764,3 +1764,45 @@ function provideHapticFeedback(intensity = 'medium') {
             break;
     }
 }
+
+// Check if device is mobile and optimize accordingly
+        if (window.GameUtils && typeof window.GameUtils.optimizeForDevice === 'function') {
+            console.log('Optimizing for device...');
+            const gameCanvas = document.getElementById('gameCanvas');
+            window.GameUtils.optimizeForDevice(gameCanvas);
+        }
+        
+        // Check WebAssembly support
+        if (window.GameUtils && typeof window.GameUtils.isWebAssemblySupported === 'function') {
+            const wasmSupported = window.GameUtils.isWebAssemblySupported();
+            console.log('WebAssembly support:', wasmSupported ? 'Yes ✅' : 'No ❌');
+            
+            if (!wasmSupported) {
+                console.warn('WebAssembly not supported - Box2D-WASM may not work correctly');
+                
+                // Show warning to user
+                const warningElement = document.createElement('div');
+                warningElement.style.position = 'absolute';
+                warningElement.style.top = '10px';
+                warningElement.style.left = '50%';
+                warningElement.style.transform = 'translateX(-50%)';
+                warningElement.style.backgroundColor = 'rgba(255, 0, 0, 0.8)';
+                warningElement.style.padding = '10px';
+                warningElement.style.borderRadius = '5px';
+                warningElement.style.color = 'white';
+                warningElement.style.fontWeight = 'bold';
+                warningElement.style.zIndex = '1000';
+                warningElement.textContent = 'Your browser does not support WebAssembly. Game physics may not work correctly.';
+                
+                document.body.appendChild(warningElement);
+                
+                // Hide after 8 seconds
+                setTimeout(() => {
+                    warningElement.style.opacity = '0';
+                    warningElement.style.transition = 'opacity 1s';
+                    setTimeout(() => {
+                        document.body.removeChild(warningElement);
+                    }, 1000);
+                }, 8000);
+            }
+        }

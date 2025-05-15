@@ -123,32 +123,53 @@ class Game {
             this.drawGame();
         }
     }
-    
-    /**
+      /**
      * Initialize Box2D physics engine
      */
     async initPhysics() {
-        // Wait for Box2D WASM to initialize
-        await Box2D.init();
-        
-        // Create shortcuts to Box2D objects
-        b2Vec2 = Box2D.b2Vec2;
-        b2BodyDef = Box2D.b2BodyDef;
-        b2Body = Box2D.b2Body;
-        b2BodyType = Box2D.b2BodyType;
-        b2FixtureDef = Box2D.b2FixtureDef;
-        b2World = Box2D.b2World;
-        b2PolygonShape = Box2D.b2PolygonShape;
-        b2CircleShape = Box2D.b2CircleShape;
-        
-        // Create a world with gravity
-        this.world = new b2World(new b2Vec2(0, 9.8)); // Earth gravity
-        
-        // Set up collision listener
-        this.world.SetContactListener({
-            BeginContact: this.handleCollision.bind(this),
-            EndContact: function() {},
-            PreSolve: function() {},
+        try {
+            // Wait for Box2D WASM to initialize
+            await Box2D.init();
+            
+            // Create shortcuts to Box2D objects
+            b2Vec2 = Box2D.b2Vec2;
+            b2BodyDef = Box2D.b2BodyDef;
+            b2Body = Box2D.b2Body;
+            b2BodyType = Box2D.b2BodyType;
+            b2FixtureDef = Box2D.b2FixtureDef;
+            b2World = Box2D.b2World;
+            b2PolygonShape = Box2D.b2PolygonShape;
+            b2CircleShape = Box2D.b2CircleShape;
+            
+            // Create a world with gravity
+            this.world = new b2World(new b2Vec2(0, 9.8)); // Earth gravity
+            
+            // Set up collision listener
+            this.world.SetContactListener({
+                BeginContact: this.handleCollision.bind(this),
+                EndContact: function() {},
+                PreSolve: function() {},
+                PostSolve: function() {}
+            });
+            
+            // Check for iOS devices and warn about potential WebAssembly issues
+            if (window.GameUtils && window.GameUtils.isIOSDevice()) {
+                console.warn('iOS device detected - Box2D-WASM may have compatibility issues');
+                this.showIOSWarning();
+            }
+            
+            // Check if we're using a fallback implementation
+            this.checkFallbackImplementation();
+            
+        } catch (error) {
+            console.error('Error initializing physics:', error);
+            
+            // Show error message to user
+            this.showPhysicsError();
+            
+            // Try to continue with fallback implementation
+            this.world = new b2World(new b2Vec2(0, 9.8));
+        }
             PostSolve: function() {}
         });
         
@@ -158,11 +179,10 @@ class Game {
     
     /**
      * Create physical boundaries for the game world
-     */
-    createBoundaries() {
+     */    createBoundaries() {
         // Create ground
         const groundDef = new b2BodyDef();
-        groundDef.position.Set(this.canvas.width / (2 * this.scale), this.canvas.height / this.scale);
+        this.safeSetPosition(groundDef.position, this.canvas.width / (2 * this.scale), this.canvas.height / this.scale);
         const ground = this.world.CreateBody(groundDef);
         
         const groundShape = new b2PolygonShape();
@@ -172,16 +192,15 @@ class Game {
         
         // Create walls on the sides
         const leftWallDef = new b2BodyDef();
-        leftWallDef.position.Set(0, this.canvas.height / (2 * this.scale));
+        this.safeSetPosition(leftWallDef.position, 0, this.canvas.height / (2 * this.scale));
         const leftWall = this.world.CreateBody(leftWallDef);
         
         const leftWallShape = new b2PolygonShape();
         leftWallShape.SetAsBox(0.5, this.canvas.height / (2 * this.scale));
         
         leftWall.CreateFixture(leftWallShape, 0);
-        
-        const rightWallDef = new b2BodyDef();
-        rightWallDef.position.Set(this.canvas.width / this.scale, this.canvas.height / (2 * this.scale));
+          const rightWallDef = new b2BodyDef();
+        this.safeSetPosition(rightWallDef.position, this.canvas.width / this.scale, this.canvas.height / (2 * this.scale));
         const rightWall = this.world.CreateBody(rightWallDef);
         
         const rightWallShape = new b2PolygonShape();
@@ -397,11 +416,12 @@ class Game {
         
         // Select current character type (T-Rex or regular)
         const useTreex = this.trexUnlocked && this.launchesRemaining === 0;
-        
-        // Create a physics body for the character
+          // Create a physics body for the character
         const characterDef = new b2BodyDef();
         characterDef.type = b2BodyType.b2_dynamicBody;
-        characterDef.position.Set(this.canvas.width * 0.1 / this.scale, this.canvas.height * 0.7 / this.scale);
+        this.safeSetPosition(characterDef.position, 
+            this.canvas.width * 0.1 / this.scale, 
+            this.canvas.height * 0.7 / this.scale);
         
         const character = this.world.CreateBody(characterDef);
         
@@ -529,12 +549,12 @@ class Game {
             
             const targetDef = new b2BodyDef();
             targetDef.type = b2BodyType.b2_dynamicBody;
-            
-            // Position targets in a formation on the right side
+              // Position targets in a formation on the right side
             const row = Math.floor(i / 5);
             const col = i % 5;
             
-            targetDef.position.Set(
+            this.safeSetPosition(
+                targetDef.position,
                 (this.canvas.width * 0.6 + col * 30) / this.scale,
                 (this.canvas.height * 0.3 + row * 40) / this.scale
             );
@@ -1047,6 +1067,131 @@ class Game {
             }
         } catch (e) {
             console.error('Error loading customizations:', e);
+        }
+    }
+    
+    /**
+     * Check if the game is using a fallback Box2D implementation
+     */
+    checkFallbackImplementation() {
+        // Check for typical properties of our fallback implementation
+        try {
+            const testVec = new b2Vec2(1, 1);
+            const usingFallback = typeof testVec.Length !== 'function';
+            
+            if (usingFallback && !this._fallbackWarningShown) {
+                console.warn('Using fallback Box2D implementation - game may not function correctly');
+                this.showFallbackWarning();
+            }
+        } catch (error) {
+            console.error('Error checking Box2D implementation:', error);
+        }
+    }
+    
+    /**
+     * Show a warning message about fallback implementation
+     */
+    showFallbackWarning() {
+        const warningElement = document.createElement('div');
+        warningElement.style.position = 'absolute';
+        warningElement.style.top = '10px';
+        warningElement.style.left = '50%';
+        warningElement.style.transform = 'translateX(-50%)';
+        warningElement.style.backgroundColor = 'rgba(255, 200, 0, 0.8)';
+        warningElement.style.padding = '10px';
+        warningElement.style.borderRadius = '5px';
+        warningElement.style.color = 'black';
+        warningElement.style.fontWeight = 'bold';
+        warningElement.style.zIndex = '1000';
+        warningElement.textContent = 'Running in limited physics mode. Game may not function correctly.';
+        
+        document.body.appendChild(warningElement);
+        
+        // Hide after 5 seconds
+        setTimeout(() => {
+            warningElement.style.opacity = '0';
+            warningElement.style.transition = 'opacity 1s';
+            setTimeout(() => {
+                document.body.removeChild(warningElement);
+            }, 1000);
+        }, 5000);
+        
+        this._fallbackWarningShown = true;
+    }
+    
+    /**
+     * Show a warning for iOS users about potential WebAssembly issues
+     */
+    showIOSWarning() {
+        const warningElement = document.createElement('div');
+        warningElement.style.position = 'absolute';
+        warningElement.style.top = '10px';
+        warningElement.style.left = '50%';
+        warningElement.style.transform = 'translateX(-50%)';
+        warningElement.style.backgroundColor = 'rgba(255, 200, 0, 0.8)';
+        warningElement.style.padding = '10px';
+        warningElement.style.borderRadius = '5px';
+        warningElement.style.color = 'black';
+        warningElement.style.fontWeight = 'bold';
+        warningElement.style.zIndex = '1000';
+        warningElement.textContent = 'iOS device detected. If game physics don\'t work correctly, please try a different browser.';
+        
+        document.body.appendChild(warningElement);
+        
+        // Hide after 5 seconds
+        setTimeout(() => {
+            warningElement.style.opacity = '0';
+            warningElement.style.transition = 'opacity 1s';
+            setTimeout(() => {
+                document.body.removeChild(warningElement);
+            }, 1000);
+        }, 8000);
+    }
+    
+    /**
+     * Show a physics initialization error message
+     */
+    showPhysicsError() {
+        const errorElement = document.createElement('div');
+        errorElement.style.position = 'absolute';
+        errorElement.style.top = '50%';
+        errorElement.style.left = '50%';
+        errorElement.style.transform = 'translate(-50%, -50%)';
+        errorElement.style.backgroundColor = 'rgba(255, 0, 0, 0.8)';
+        errorElement.style.padding = '20px';
+        errorElement.style.borderRadius = '10px';
+        errorElement.style.color = 'white';
+        errorElement.style.fontWeight = 'bold';
+        errorElement.style.zIndex = '1000';
+        errorElement.style.textAlign = 'center';
+        errorElement.innerHTML = `
+            <h3>Physics Engine Error</h3>
+            <p>There was a problem initializing the physics engine.</p>
+            <p>The game will attempt to continue with limited functionality.</p>
+            <button id="continue-btn" style="padding: 10px; margin-top: 10px; cursor: pointer;">Continue Anyway</button>
+        `;
+        
+        document.body.appendChild(errorElement);
+        
+        document.getElementById('continue-btn').addEventListener('click', () => {
+            document.body.removeChild(errorElement);
+        });
+    }
+    
+    /**
+     * Helper method to set position safely across different Box2D versions
+     * @param {Object} positionObj - Box2D position object
+     * @param {number} x - X position
+     * @param {number} y - Y position
+     */
+    safeSetPosition(positionObj, x, y) {
+        if (typeof positionObj.Set === 'function') {
+            // Using older Box2D API
+            positionObj.Set(x, y);
+        } else {
+            // Using newer Box2D-WASM API
+            positionObj.x = x;
+            positionObj.y = y;
         }
     }
 }
