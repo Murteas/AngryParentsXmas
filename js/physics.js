@@ -24,15 +24,37 @@ class GamePhysics {
         // Physics bodies
         this.bodies = [];
     }
-    
-    /**
+      /**
      * Initialize Box2D physics engine
      * @returns {Promise} Promise that resolves when Box2D is initialized
      */
     async init() {
         try {
+            // Check if Box2D is available
+            if (typeof Box2D === 'undefined') {
+                console.error('Box2D is not loaded yet');
+                
+                // Wait for Box2D to load (maximum 5 seconds)
+                await new Promise((resolve, reject) => {
+                    let attempts = 0;
+                    const checkInterval = setInterval(() => {
+                        attempts++;
+                        
+                        if (typeof Box2D !== 'undefined') {
+                            clearInterval(checkInterval);
+                            resolve();
+                        } else if (attempts > 50) { // 5 seconds (100ms * 50)
+                            clearInterval(checkInterval);
+                            reject(new Error('Box2D failed to load after 5 seconds'));
+                        }
+                    }, 100);
+                });
+            }
+            
             // Wait for Box2D WASM to initialize
-            await Box2D.init();
+            if (typeof Box2D.init === 'function') {
+                await Box2D.init();
+            }
             
             // Create shortcuts to Box2D objects
             this.b2Vec2 = Box2D.b2Vec2;

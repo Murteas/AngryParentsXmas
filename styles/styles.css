@@ -234,6 +234,99 @@ body {
     font-weight: bold;
 }
 
+/* Loading Screen */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, #1a2a3a, #0a1a2a);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.loading-content {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    padding: 2rem;
+    width: 80%;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.loading-content h2 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    font-weight: bold;
+}
+
+.loading-content .progress {
+    height: 20px;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+/* In-game Loading Indicator */
+.in-game-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 8px;
+    padding: 1rem;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    color: white;
+    z-index: 100;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Error Display */
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+    text-align: left;
+    border: 1px solid #f5c6cb;
+}
+
+/* Fade Out Animation */
+.fade-out {
+    animation: fadeOut 0.5s forwards;
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* Slingshot Highlight */
+.slingshot-highlight {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.3);
+    border: 2px dashed #f1c40f;
+    animation: pulse 1.5s infinite;
+    pointer-events: none;
+    z-index: 50;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.1); opacity: 0.9; }
+    100% { transform: scale(1); opacity: 0.7; }
+}
+
 /* Responsive adjustments for iPhone */
 @media (max-width: 576px) {
     .game-header h1 {

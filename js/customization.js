@@ -113,8 +113,7 @@ class GameCustomization {
     /**
      * Handle photo upload
      * @param {Event} event - Input change event
-     */
-    handlePhotoUpload(event) {
+     */    handlePhotoUpload(event) {
         const files = event.target.files;
         
         if (!files || files.length === 0) {
@@ -127,36 +126,93 @@ class GameCustomization {
             return;
         }
         
+        // Show loading indicator
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'in-game-loading';
+        loadingDiv.innerHTML = `
+            <div class="loading-content">
+                <p>Processing photos...</p>
+                <div class="progress">
+                    <div id="photoProcessingProgress" class="progress-bar progress-bar-striped progress-bar-animated" 
+                         role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+        `;
+        document.getElementById('gameContainer').appendChild(loadingDiv);
+        
+        // Track processed files for progress
+        let processedCount = 0;
+        const totalFiles = files.length;
+        
         // Process each file
         Array.from(files).forEach(file => {
             // Check file type
             if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
                 alert('Only JPEG and PNG images are allowed.');
+                processedCount++;
+                updatePhotoProcessingProgress(processedCount, totalFiles);
                 return;
             }
             
             // Check file size
             if (file.size > this.MAX_FILE_SIZE) {
                 alert(`File ${file.name} is too large. Maximum size is 2MB.`);
+                processedCount++;
+                updatePhotoProcessingProgress(processedCount, totalFiles);
                 return;
             }
             
             // Read and store the file
             const reader = new FileReader();
             reader.onload = (e) => {
-                this.uploadedPhotos.push({
-                    name: file.name,
-                    dataUrl: e.target.result
+                this.resizeImage(e.target.result, 800, 800).then(resizedDataUrl => {
+                    this.uploadedPhotos.push({
+                        name: file.name,
+                        dataUrl: resizedDataUrl
+                    });
+                    
+                    // Update progress
+                    processedCount++;
+                    updatePhotoProcessingProgress(processedCount, totalFiles);
+                    
+                    // If all files processed, update UI
+                    if (processedCount === totalFiles) {
+                        // Update the preview and gnome selector
+                        this.updatePhotoPreview();
+                    }
+                }).catch(error => {
+                    console.error('Error resizing image:', error);
+                    alert('Failed to process the uploaded image. Please try again.');
+                    
+                    // Update progress even on error
+                    processedCount++;
+                    updatePhotoProcessingProgress(processedCount, totalFiles);
                 });
-                
-                // Update the preview and gnome selector
-                this.updatePhotoPreview();
             };
             reader.readAsDataURL(file);
         });
         
         // Reset the file input to allow selecting the same files again
         event.target.value = '';
+        
+        // Function to update progress bar
+        const updatePhotoProcessingProgress = (current, total) => {
+            const progress = Math.round((current / total) * 100);
+            const progressBar = document.getElementById('photoProcessingProgress');
+            if (progressBar) {
+                progressBar.style.width = `${progress}%`;
+                progressBar.setAttribute('aria-valuenow', progress);
+            }
+            
+            // If all done, remove the loading div after a short delay
+            if (current >= total) {
+                setTimeout(() => {
+                    if (document.getElementById('gameContainer').contains(loadingDiv)) {
+                        document.getElementById('gameContainer').removeChild(loadingDiv);
+                    }
+                }, 500);
+            }
+        };
     }
     
     /**
@@ -355,6 +411,63 @@ class GameCustomization {
      */
     hideForm() {
         document.getElementById('customizeForm').classList.add('d-none');
+    }
+    
+    /**
+     * Resize an image to specified dimensions
+     * @param {string} dataUrl - Image data URL
+     * @param {number} maxWidth - Maximum width for the image
+     * @param {number} maxHeight - Maximum height for the image
+     * @returns {Promise<string>} Resized image data URL
+     */
+    resizeImage(dataUrl, maxWidth, maxHeight) {
+        return new Promise((resolve, reject) => {
+            try {
+                const img = new Image();
+                img.onload = () => {
+                    // Calculate new dimensions while maintaining aspect ratio
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height *= maxWidth / width;
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width *= maxHeight / height;
+                            height = maxHeight;
+                        }
+                    }
+                    
+                    // Create a canvas to draw the resized image
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    // Draw the image on the canvas
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Get the resized image as data URL
+                    const resizedDataUrl = canvas.toDataURL(
+                        img.src.startsWith('data:image/png') ? 'image/png' : 'image/jpeg',
+                        0.85 // Quality setting for JPEG
+                    );
+                    
+                    resolve(resizedDataUrl);
+                };
+                
+                img.onerror = () => {
+                    reject(new Error('Failed to load image for resizing'));
+                };
+                
+                img.src = dataUrl;
+            } catch (error) {
+                reject(error);
+            }
+        });
     }
 }
 
