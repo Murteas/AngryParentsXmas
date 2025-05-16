@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Angry Parents: Christmas Edition</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <main class="container py-4">
+    <h1 class="text-center mb-4">Angry Parents: Christmas Edition</h1>
+    <div id="customization-form-container">
+      <form id="customization-form" class="needs-validation" novalidate>
+        <div class="mb-3">
+          <label for="photos" class="form-label">Upload 5-10 Family Photos</label>
+          <input class="form-control" type="file" id="photos" name="photos" accept="image/jpeg,image/png" multiple required aria-describedby="photosHelp">
+          <div id="photosHelp" class="form-text">JPEG/PNG, max 2MB each. Crop to faces after upload.</div>
+          <div class="invalid-feedback">Please upload 5-10 valid photos.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Enter 10-15 Funny Messages</label>
+          <div id="messages-container"></div>
+          <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="add-message-btn">Add Message</button>
+        </div>
+        <div class="mb-3">
+          <label for="gnome-photo" class="form-label">Select Gnome Character Photo</label>
+          <select class="form-select" id="gnome-photo" name="gnome-photo" required></select>
+          <div class="invalid-feedback">Please select a gnome photo.</div>
+        </div>
+        <button type="submit" class="btn btn-primary">Save and Start</button>
+      </form>
+      <div id="photo-preview" class="d-flex flex-wrap mt-3"></div>
+      <div id="form-error" class="alert alert-danger d-none mt-3" role="alert"></div>
+    </div>
+    <div id="game-container" class="d-none">
+      <div id="phaser-game"></div>
+    </div>
+    <div id="leaderboard-modal" class="modal fade" tabindex="-1" aria-labelledby="leaderboardLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="leaderboardLabel">Leaderboard</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="leaderboard-content"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="new-round-btn">Start New Round</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+  <script src="js/customization.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/leaderboard.js"></script>
+</body>
+</html>
