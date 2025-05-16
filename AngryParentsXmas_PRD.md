@@ -1,17 +1,17 @@
-# Updated Product Requirements Document (PRD) for *Angry Parents: Christmas Edition*
+# Final Product Requirements Document (PRD) for *Angry Parents: Christmas Edition*
 
 ## 1. Overview
-**Purpose:** *Angry Parents: Christmas Edition* is a simple, web-based, single-player arcade game designed for a family Christmas party. It runs on iPhones, requires no hosting costs, and is customized by the host (you) before the party with family photos and funny messages. Players launch characters to knock down targets, earning points displayed on a leaderboard to determine a winner. The game is nostalgic, reviving the family’s *Angry Parents* game, and includes Christmas theming for festive fun.
+**Purpose:** *Angry Parents: Christmas Edition* is a simple, web-based, single-player arcade game designed for a family Christmas party. Each player uses their own iPhone to play, accessing the game via a URL. The game requires no hosting costs and is pre-customized with family photos and funny messages embedded in the code before deployment. Players launch characters to knock down targets, earning points to share verbally with the group to determine a winner. The game revives the family’s nostalgic *Angry Parents* game with Christmas theming.
 
-**Target Audience:** A multigenerational family (parents, teenage and adult children, and spouses) who enjoy arcade-style games and creative humor.
+**Target Audience:** A multigenerational family (parents, teenage and adult children, and spouses, approximately 6-12 players) who enjoy arcade-style games and creative humor.
 
 **Platform:** Web-based game accessible via a URL on iPhone browsers (e.g., Safari), ensuring no app store downloads or hosting costs.
 
 **Key Features:**
-- Single-player slingshot mechanic (like *Angry Birds*).
-- Pre-customized by the host with family photos and funny messages.
+- Single-player slingshot mechanic (like *Angry Birds*), with each player using their own iPhone.
+- Pre-customized with family photos and funny messages embedded in the code.
 - Christmas-themed visuals, sounds, and targets.
-- 2-3 minute rounds with a local leaderboard for score comparison.
+- 2-3 minute rounds with scores shared verbally.
 
 ---
 
@@ -20,54 +20,46 @@
 ### 2.1 Gameplay
 - **Objective:** Players use a slingshot to launch characters (pre-customized with family photos) at Christmas-themed targets to earn points.
 - **Round Structure:**
-  - Duration: 2-3 minutes per round.
-  - Launches: 5 per round, each taking ~20-30 seconds (drag-and-release mechanic).
+  - Duration: 2-3 minutes per round, including 5 launches (each ~20-30 seconds), animations (e.g., targets falling, score updates), and transitions.
   - Targets: 10-15 objects (e.g., presents, ornaments, gnome statues, Christmas tree) with varying point values (10-50 points).
-  - Bonus: A T-Rex “ultimate weapon” launch (unlocked after 500 points) clears all targets for extra points (100 points).
+  - Bonus: A T-Rex “ultimate weapon” launch (unlocked after 500 points in a round) clears all targets for 100 bonus points, usable once during remaining launches (e.g., if unlocked after the third launch, available for the fourth or fifth).
 - **Scoring:**
-  - Points awarded for each target hit (e.g., present = 10 points, gnome statue = 50 points).
-  - Bonus points for speed (e.g., +50 for finishing in <2 minutes) or “perfect shots” (e.g., +20 for clearing all targets in one launch).
-  - Score displayed at the end of the round (e.g., “You scored 1,200 points!”).
+  - Points awarded per target hit (e.g., present = 10 points, gnome statue = 50 points).
+  - Bonus points for speed (+50 for finishing in <2 minutes) or “perfect shots” (+20 for clearing all targets in one launch).
+  - Score displayed prominently at the end of the round (e.g., “Your Score: 1,200 points!”).
+- **Game Over:** After a round, a “Round Over” screen shows the player’s score with a “Play Again” button to restart the game.
 
-### 2.2 Customization (Pre-Configured by Host)
+### 2.2 Customization (Embedded in Code)
 - **Family Photos:**
-  - The host uploads 5-10 family photos via a web form before the party (JPEG/PNG, <2MB each).
+  - 5-10 family photos (JPEG/PNG, <2MB each) are embedded in the game’s code before deployment.
   - Photos are mapped to launchable characters (e.g., “Dad,” “Mom”).
-  - One character is a Scandinavian gnome with a family member’s face (host selects which photo).
+  - One character is a Scandinavian gnome with a family member’s face (specified by the organizer during development).
 - **Funny Messages:**
-  - The host provides 10-15 custom messages via the web form (e.g., “Smashed Uncle Bob’s fruitcake tower!”).
+  - 10-15 custom messages (max 50 characters each) are embedded in the code (e.g., “Smashed Uncle Bob’s fruitcake tower!”).
   - Messages display randomly when targets are hit.
 - **T-Rex Ultimate Weapon:**
-  - Appears as a launchable character after reaching 500 points in a round.
-  - Wears a Santa hat and smashes all targets when launched.
+  - Embedded as a launchable character (with a Santa hat) after reaching 500 points.
 - **Customization Process:**
-  - The host accesses a web form (via the game URL) before the party to:
-    - Upload 5-10 family photos.
-    - Enter 10-15 funny messages (max 50 characters each).
-    - Select a photo for the gnome character.
-  - The form is simple, takes ~10-15 minutes to complete, and saves the data locally in the browser session.
-  - **Note:** Players do not upload or customize anything; they access the pre-configured game.
+  - The organizer provides photos and messages to the developer before deployment.
+  - These are hard-coded into the game (e.g., as base64-encoded images or text arrays in JavaScript).
+  - No player or organizer customization occurs post-deployment.
 
-### 2.3 Leaderboard
-- **Functionality:** Displays top scores (name + score) after each round.
-- **Implementation:** Local leaderboard stored in the browser session (no server required).
-- **Access:** Players view the leaderboard via the game’s URL on any iPhone.
-- **Example:**
-  - Sally: 1,200 points
-  - Tim: 1,050 points
-  - Emma: 900 points
-- **Input:** Players enter their name (max 20 characters) before starting a round.
+### 2.3 Score Sharing
+- **Verbal Score Sharing:**
+  - Players verbally report their scores to the group after each round (e.g., “I got 1,200 points!”).
+  - The “Round Over” screen displays the score in large, clear text to facilitate sharing.
+  - No leaderboard is implemented, simplifying development and avoiding data storage needs.
+  - The organizer can track scores informally (e.g., on paper) to declare a winner.
 
 ### 2.4 Christmas Theming
 - **Visuals:**
   - Background: Scandinavian-style Christmas scene (cozy cabin, snowflakes, twinkling lights).
-  - Targets: Presents, ornaments, gnome statues, wobbly Christmas tree.
-  - Characters: Family photo faces on bodies (cartoon-style parents or gnome), T-Rex with a Santa hat.
+  - Targets: Presents (square, colorful), ornaments (round, shiny), gnome statues (tall, pointed hat), wobbly Christmas tree (large, 50 points).
+  - Characters: Family photo faces on cartoon-style bodies or gnome, T-Rex with a Santa hat.
 - **Sound Effects:**
-  - Jingle bells when a target is hit.
-  - Soft “ho ho ho” for a perfect shot.
-  - T-Rex roar (with jingling bells) for the ultimate weapon.
-- **Background Music:** Optional lo-fi “Winter Wonderland” track (toggleable on/off).
+  - Jingle bells for target hits, “ho ho ho” for perfect shots, T-Rex roar (with jingling bells) for the ultimate weapon.
+- **Background Music:** Optional lo-fi “Winter Wonderland” track.
+- **Sound Controls:** Separate on/off toggles for sound effects and music, accessible from the main menu or settings screen.
 
 ---
 
@@ -77,77 +69,91 @@
 - Runs on iPhone browsers (Safari, Chrome) via a URL.
 - Responsive design for iPhone screen sizes (e.g., iPhone 12, 14, 16).
 - No app store deployment or server hosting to ensure zero cost.
+- Each player uses their own iPhone for gameplay.
 
 ### 3.2 Performance
 - Load time: <5 seconds on a standard iPhone with 4G/Wi-Fi.
 - Smooth gameplay: 60 FPS for slingshot and physics animations.
-- Local storage: <10MB for photos, messages, and leaderboard data.
+- Local storage: <10MB for game assets (no runtime storage needed).
 
 ### 3.3 Usability
-- **Host Customization:** The host completes a one-time setup via a web form before the party; players do not interact with customization.
-- **Player Experience:** Players access the game via a URL, enter their name, play a round, and view the leaderboard—no additional setup required.
+- **Customization:** Handled by the developer pre-deployment; players only play the game.
+- **Player Experience:** Players access the game URL, enter their name (optional, for immersion), play a round, and verbally share their score—no setup required.
 - Intuitive controls: Drag-and-release slingshot (tap to zoom/aim optional).
 - Clear UI: Score, launches remaining, and target health visible on-screen.
-- Accessible to all ages (teens to adults) with minimal instructions.
+- Minimal instructions for all ages (teens to adults).
 
-### 3.4 Security
-- No user data stored online; all data (photos, messages) stored locally in the browser session.
-- Web form validates inputs (e.g., image size, text length) to prevent errors.
+### 3.4 Accessibility
+- High color contrast for text and key elements to aid visual impairments.
+- Playable without sound (visual cues for all actions).
+- Optional tooltips or a short tutorial (e.g., “Drag to aim, release to launch”) for first-time players.
+- No screen reader support required.
+
+### 3.5 Security
+- No user data stored or uploaded; customization is hard-coded.
+- No runtime data collection, ensuring privacy.
 
 ---
 
 ## 4. Technical Requirements
 - **Frontend:**
   - HTML5, CSS3, JavaScript for web-based game.
-  - **Recommended Tool:** Phaser.js is suggested for its 2D game framework, physics engine (for slingshot mechanics), and mobile support. However, the developer may choose another framework if preferred.
+  - **Recommended Tool:** Phaser.js for its 2D game framework, physics engine, and mobile support (developer may choose another framework, e.g., PixiJS, if preferred).
   - Canvas/WebGL for 2D physics and animations (e.g., Box2D.js or Matter.js if not using Phaser).
   - Responsive framework (e.g., Bootstrap) for iPhone compatibility.
 - **Storage:**
-  - LocalStorage or IndexedDB for photos, messages, and leaderboard.
-  - No backend/server to keep costs at zero.
+  - No runtime storage; customization is hard-coded.
 - **Assets:**
-  - Sprite sheets for characters (family photos cropped to faces), targets, and T-Rex.
-  - Audio files for jingle bells, T-Rex roar, and background music (<1MB total).
-- **Customization Form:**
-  - Simple HTML form with file upload (photos) and text input (messages).
-  - Client-side validation for file size and text length.
+  - Hard-coded sprite sheets for characters (family photos cropped to faces), targets, and T-Rex.
+  - Audio files for jingle bells, T-Rex roar, and music (<1MB total).
+- **Error Handling:**
+  - If a launch fails (e.g., no collision), deduct the launch and continue.
+  - Ensure robust asset loading to prevent crashes if images/audio fail to load.
 
 ---
 
 ## 5. Constraints
-- **Cost:** Zero hosting or deployment costs (no server or app store).
-- **Timeline:** Game is for a one-time Christmas party, so simplicity is key.
-- **Scope:** Single-player only, no multiplayer networking.
-- **Usage:** Likely used only once, so prioritize ease of setup over scalability.
+- **Cost:** Zero hosting or deployment costs (e.g., use GitHub Pages).
+- **Timeline:** One-time Christmas party, prioritizing simplicity.
+- **Scope:** Single-player on individual iPhones, no multiplayer networking.
+- **Usage:** Likely used once, so no scalability needed.
 
 ---
 
 ## 6. Assumptions
-- The host has access to an iPhone or computer to complete the customization form before the party.
-- Family has access to iPhones with modern browsers (Safari/Chrome, iOS 16+).
-- Wi-Fi or mobile data is available to load the game URL initially.
-- The host can provide 5-10 photos and 10-15 messages before the party.
-- Players are comfortable passing a phone or accessing the URL on their own devices.
+- Players have iPhones with modern browsers (Safari/Chrome, iOS 16+).
+- Wi-Fi or mobile data is available to load the game URL.
+- The organizer provides 5-10 photos and 10-15 messages to the developer before deployment.
+- Approximately 6-12 players will participate, sharing scores verbally.
 
 ---
 
 ## 7. Deliverables
 - **Web-Based Game:**
-  - Accessible via a URL (e.g., hosted on a free static site like GitHub Pages).
-  - Includes gameplay, host customization form, and leaderboard.
+  - Hosted on a free static site (e.g., GitHub Pages) with a URL for gameplay.
+  - Includes pre-customized assets (photos, messages) and gameplay.
 - **Documentation:**
-  - User guide for the host to complete customization and for players to access the game.
-  - Setup instructions for uploading photos/messages (provided in-game).
+  - Guide for players to access the game and verbally share scores.
+  - Instructions for the organizer to provide customization data (photos, messages) to the developer.
 
 ---
 
 ## 8. Success Criteria
-- The host successfully customizes the game before the party with photos and messages.
-- Game loads and runs smoothly on iPhones for all players.
-- Rounds take 2-3 minutes, and scores are accurately tracked on the leaderboard.
+- The developer embeds customization (photos, messages) correctly before deployment.
+- Game runs smoothly on each player’s iPhone via the provided URL.
+- Rounds take 2-3 minutes, with scores easily shared verbally.
 - Family enjoys the nostalgic and humorous elements, sparking laughter and competition.
 
 ---
 
-### Additional Note on Technology Stack
-- **Phaser.js Recommendation:** Phaser.js is suggested due to its suitability for 2D arcade games, built-in physics engine, and mobile optimization. It can simplify development and ensure the game runs smoothly on iPhones. However, the final choice of framework is left to the developer’s discretion, as they may have expertise in other tools (e.g., PixiJS, Cocos2d-js) that could also meet the requirements.
+## 9. Responses to Developer Questions
+- **Device Usage:** Each player uses their own iPhone for gameplay. Scores are shared verbally, with no leaderboard.
+- **Leaderboard Persistence:** Not applicable; verbal score sharing eliminates the need for a leaderboard.
+- **Customization Data:** Photos and messages are hard-coded by the developer; no runtime customization or storage.
+- **Gameplay Timing:** 2-3 minutes includes 5 launches (100-150 seconds) plus animations/transitions. Cap at 3 minutes with a timer if needed.
+- **T-Rex Unlock:** Unlocked at 500 points, usable once in remaining launches of the same round.
+- **Sound Controls:** Separate on/off toggles for sound effects and music.
+- **Accessibility:** High contrast and sound-independent play; no screen reader support.
+- **Error Handling:** Deduct failed launches; ensure robust asset loading.
+- **Game Over:** “Round Over” screen with score and “Play Again” button.
+- **Multiplayer Aspect:** Single-player on individual iPhones, with verbal score sharing.
