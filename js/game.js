@@ -160,8 +160,7 @@ class Game {
             
             // Check if we're using a fallback implementation
             this.checkFallbackImplementation();
-            
-        } catch (error) {
+              } catch (error) {
             console.error('Error initializing physics:', error);
             
             // Show error message to user
@@ -170,8 +169,6 @@ class Game {
             // Try to continue with fallback implementation
             this.world = new b2World(new b2Vec2(0, 9.8));
         }
-            PostSolve: function() {}
-        });
         
         // Create ground and boundaries
         this.createBoundaries();
